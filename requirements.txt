@@ -1,3 +1,9 @@
 altair
+faiss-cpu
+langchain
+openai
 pandas
 streamlit
+streamlit_chat
+streamlit-extras
+tiktoken
