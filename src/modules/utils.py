@@ -12,10 +12,7 @@ class Utilities:
         """
         Loads the OpenAI API key from the user's input and returns it
         """
-        if (
-            hasattr(st.session_state, "api_key")
-            and st.session_state.api_key is not None
-        ):
+        if hasattr(st.session_state, "api_key") and st.session_state.api_key is not None:
             user_api_key = st.session_state.api_key
             st.sidebar.success("API key loaded from previous input", icon="🚀")
         else:
@@ -35,9 +32,7 @@ class Utilities:
         Handles and display uploaded_file
         :param file_types: List of accepted file types, e.g., ["csv"]
         """
-        uploaded_file = st.sidebar.file_uploader(
-            "upload", type=file_types, label_visibility="collapsed"
-        )
+        uploaded_file = st.sidebar.file_uploader("upload", type=file_types, label_visibility="collapsed")
         if uploaded_file is not None:
 
             def show_csv_file(uploaded_file):
@@ -55,7 +50,7 @@ class Utilities:
         return uploaded_file
 
     @staticmethod
-    def setup_chatbot(uploaded_file, model, temperature):
+    def setup_chatbot(uploaded_file, model, temperature, openai_api_key):
         """
         Sets up the chatbot with the uploaded file, model, and temperature
         """
@@ -68,7 +63,7 @@ class Utilities:
             vectors = embeds.getDocEmbeds(file, uploaded_file.name)
 
             # Create a Chatbot instance with the specified model and temperature
-            chatbot = Chatbot(model, temperature, vectors)
+            chatbot = Chatbot(model, temperature, vectors, openai_api_key)
         st.session_state["ready"] = True
 
         return chatbot

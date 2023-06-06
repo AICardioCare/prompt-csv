@@ -1,13 +1,14 @@
+import os
 import re
 import sys
-from modules.history import ChatHistory
-from modules.layout import Layout
-from modules.utils import Utilities
-from modules.sidebar import Sidebar
 from io import StringIO
-import os
 
 import streamlit as st
+
+from modules.history import ChatHistory
+from modules.layout import Layout
+from modules.sidebar import Sidebar
+from modules.utils import Utilities
 
 
 # To be able to update the changes made to modules in localhost (press r)
@@ -30,7 +31,7 @@ Layout = layout_module.Layout
 Utilities = utils_module.Utilities
 Sidebar = sidebar_module.Sidebar
 
-st.set_page_config(layout="wide", page_icon="❤️", page_title="AI Cardio Care | Speak to your Heartt💓")
+st.set_page_config(layout="wide", page_icon="❤️", page_title="AI Cardio Care | Speak to your Heart💓")
 
 # Instantiate the main components
 layout, sidebar, utils = Layout(), Sidebar(), Utilities()
@@ -43,18 +44,17 @@ uploaded_file = utils.handle_upload(["csv"])
 if not user_api_key:
     layout.show_api_key_missing()
 
-os.environ["OPENAI_API_KEY"] = user_api_key
-
 # Configure the sidebar
 sidebar.show_options()
 sidebar.about()
 
-
-if uploaded_file:
+if user_api_key and uploaded_file:
     # Initialize chat history
     history = ChatHistory()
     try:
-        chatbot = utils.setup_chatbot(uploaded_file, st.session_state["model"], st.session_state["temperature"])
+        chatbot = utils.setup_chatbot(
+            uploaded_file, st.session_state["model"], st.session_state["temperature"], user_api_key
+        )
         st.session_state["chatbot"] = chatbot
 
         if st.session_state["ready"]:

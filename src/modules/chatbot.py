@@ -11,10 +11,11 @@ langchain.verbose = False
 
 
 class Chatbot:
-    def __init__(self, model_name, temperature, vectors):
+    def __init__(self, model_name, temperature, vectors, openai_api_key):
         self.model_name = model_name
         self.temperature = temperature
         self.vectors = vectors
+        self.openai_api_key = openai_api_key
 
     qa_template = """
         You are a helpful AI assistant named AI Cardio Care. The user gives you a file its content is represented by the following pieces of context, use them to answer the question at the end.
@@ -34,7 +35,7 @@ class Chatbot:
         """
         Start a conversational chat with a model via Langchain
         """
-        llm = ChatOpenAI(model_name=self.model_name, temperature=self.temperature)
+        llm = ChatOpenAI(model_name=self.model_name, temperature=self.temperature, openai_api_key=self.openai_api_key)
 
         retriever = self.vectors.as_retriever()
 
