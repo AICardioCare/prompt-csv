@@ -21,10 +21,19 @@ st.markdown(
     <h5 style='text-align:center;'>I'm AI Cardio Care, an intelligent chatbot created by combining 
     the strengths of Langchain and Streamlit. I use large language models to provide
     context-sensitive natural language interactions. My goal is to help you better understand your data.
-    Please select "Open AI" or "CSV Agent" from left side bar to analyze your data</h5>
+    </h5>
 
+    <br>
+    <h5>
+    Please select "Open AI" or "CSV Agent" from left side bar to analyze your data
+    <br>
+    <br>
     Open AI - With Open AI agent, the data is sent to OpenAI and answers are returned by OpenAI
-    CSV Agent - Uses Open AI to understand the question, and then uses the response from OpenAI to query the data (data is NOT sent to OpenAI)
+    <br>
+    <br>
+    CSV Agent - Uses Open AI to generate python code for the user question, and then executes the code against the data (data is NOT sent to OpenAI).
+
+    </h5>
     """,
     unsafe_allow_html=True,
 )
