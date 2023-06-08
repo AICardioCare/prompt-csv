@@ -1,4 +1,5 @@
 import os
+
 import pandas as pd
 import streamlit as st
 
@@ -39,7 +40,7 @@ class Utilities:
                 file_container = st.expander("Your CSV file :")
                 uploaded_file.seek(0)
                 shows = pd.read_csv(uploaded_file)
-                file_container.write(shows)
+                file_container.write(shows.head())
 
             show_csv_file(uploaded_file)
 

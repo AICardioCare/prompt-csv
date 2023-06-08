@@ -1,7 +1,13 @@
+import re
+import sys
+from io import StringIO
+
+import pandas as pd
 import streamlit as st
-from langchain.agents import create_csv_agent
+from langchain.agents import create_pandas_dataframe_agent
 from langchain.llms import OpenAI
 
+from modules.history import ChatHistory
 from modules.layout import Layout
 from modules.sidebar import Sidebar
 from modules.utils import Utilities
@@ -41,5 +47,56 @@ sidebar.show_options()
 sidebar.about()
 
 if user_api_key and uploaded_file:
-    agent = create_csv_agent(OpenAI(temperature=0, openai_api_key=user_api_key), "titanic.csv", verbose=True)
-    agent.run("how many rows are there?")
+    uploaded_file.seek(0)
+
+    # Read Data as Pandas
+    data = pd.read_csv(uploaded_file)
+
+    # Define pandas df agent - 0 ~ no creativity vs 1 ~ very creative
+    chatbot = create_pandas_dataframe_agent(OpenAI(temperature=0, openai_api_key=user_api_key), data, verbose=True)
+
+    # Initialize chat history
+    history = ChatHistory()
+    try:
+        st.session_state["chatbot"] = chatbot
+
+        # Create containers for chat responses and user prompts
+        response_container, prompt_container = st.container(), st.container()
+
+        with prompt_container:
+            # Display the prompt form
+            is_ready, user_input = layout.prompt_form()
+
+            # Initialize the chat history
+            history.initialize(uploaded_file)
+
+            # Reset the chat history if button clicked
+            if st.session_state["reset_chat"]:
+                history.reset(uploaded_file)
+
+            if is_ready:
+                # Update the chat history and display the chat messages
+                history.append("user", user_input)
+
+                old_stdout = sys.stdout
+                sys.stdout = captured_output = StringIO()
+
+                output = st.session_state["chatbot"].run(user_input)
+
+                sys.stdout = old_stdout
+
+                history.append("assistant", output)
+
+                # Clean up the agent's thoughts to remove unwanted characters
+                thoughts = captured_output.getvalue()
+                cleaned_thoughts = re.sub(r"\x1b\[[0-9;]*[a-zA-Z]", "", thoughts)
+                cleaned_thoughts = re.sub(r"\[1m>", "", cleaned_thoughts)
+
+                # Display the agent's thoughts
+                with st.expander("Display the agent's thoughts"):
+                    st.write(cleaned_thoughts)
+
+        history.generate_messages(response_container)
+
+    except Exception as e:
+        st.error(f"Error: {str(e)}")
